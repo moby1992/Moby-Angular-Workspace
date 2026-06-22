@@ -206,6 +206,25 @@ export class UiTable<T = Record<string, unknown>> {
     return column.header ?? column.key;
   }
 
+  /** Alignment helper class for a column (applied to header + cells). */
+  private alignClass(align?: TableColumn<T>['align']): string {
+    return align === 'end'
+      ? 'ui-col--end'
+      : align === 'center'
+        ? 'ui-col--center'
+        : '';
+  }
+
+  /** Combined class list for a header cell. */
+  protected thClass(column: TableColumn<T>): string {
+    return [column.headerClass, this.alignClass(column.align)].filter(Boolean).join(' ');
+  }
+
+  /** Combined class list for a body cell. */
+  protected tdClass(column: TableColumn<T>): string {
+    return [column.cellClass, this.alignClass(column.align)].filter(Boolean).join(' ');
+  }
+
   /** Resolve the formatted display value for a cell. */
   protected display(column: TableColumn<T>, row: T): string {
     if (column.cell) {

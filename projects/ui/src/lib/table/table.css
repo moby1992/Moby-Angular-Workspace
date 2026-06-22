@@ -19,18 +19,47 @@
 
 .ui-table__scroll {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ui-table__table {
   width: 100%;
-  table-layout: fixed;
+  /* Auto layout + nowrap lets columns keep their natural/configured width and
+     overflow horizontally (scrollbar on .ui-table__scroll) instead of being
+     squeezed to fit, so every column — including actions — stays visible. */
+  min-width: max-content;
 }
 
 .ui-table__table th,
 .ui-table__table td {
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Sticky columns need a solid background so scrolled content doesn't show
+   through them during horizontal scroll. */
+.ui-table__table .mat-mdc-table-sticky {
+  background: var(--mat-sys-surface, #fff);
+}
+
+/* Column alignment — applied to header (incl. the sort-header content) and cells
+   so numeric columns line up with their header label. */
+.ui-col--end {
+  text-align: right;
+}
+
+/* ::ng-deep pierces emulated encapsulation to reach Material's sort-header
+   internals, so a sortable numeric header's label + arrow align with its
+   right-aligned cells. */
+.ui-col--end ::ng-deep .mat-sort-header-container {
+  justify-content: flex-end;
+}
+
+.ui-col--center {
+  text-align: center;
+}
+
+.ui-col--center ::ng-deep .mat-sort-header-container {
+  justify-content: center;
 }
 
 .ui-table__select-cell,
@@ -40,9 +69,15 @@
 }
 
 .ui-table__actions-cell {
-  width: 1%;
   white-space: nowrap;
-  text-align: end;
+  text-align: right;
+}
+
+/* Keep the action buttons on a single row and snug together. */
+.ui-table__actions-cell .mat-mdc-icon-button {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
 }
 
 .ui-table__row--clickable {

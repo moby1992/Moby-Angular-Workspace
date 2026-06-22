@@ -54,20 +54,18 @@
             *matHeaderCellDef
             [mat-sort-header]="column.key"
             [disabled]="!(sortable() && column.sortable)"
-            [class]="column.headerClass"
+            [class]="thClass(column)"
             [style.width]="column.width"
-            [style.max-width]="column.width"
-            [style.text-align]="column.align"
+            [style.min-width]="column.width"
           >
             {{ header(column) }}
           </th>
           <td
             mat-cell
             *matCellDef="let row; let i = index"
-            [class]="column.cellClass"
+            [class]="tdClass(column)"
             [style.width]="column.width"
-            [style.max-width]="column.width"
-            [style.text-align]="column.align"
+            [style.min-width]="column.width"
           >
             @if (templateFor(column.key); as tpl) {
               <ng-container
