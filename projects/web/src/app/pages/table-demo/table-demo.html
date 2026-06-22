@@ -1,0 +1,77 @@
+<header class="page-header">
+  <h1 class="page-header__title">Data Table</h1>
+  <p class="page-header__desc">
+    A configuration-driven Material table from the <code>ui</code> library.
+    Columns, widths, alignment, formatting, row actions, selection and custom
+    cell templates are all driven by inputs. Paging and sorting can run on the
+    client or be delegated to the server.
+  </p>
+</header>
+
+<mat-tab-group>
+  <!-- Client-side paging + sorting -->
+  <mat-tab label="Client-side">
+    <div class="tab-body">
+      <p class="hint">
+        @if (selectedCount() > 0) {
+          <strong>{{ selectedCount() }}</strong> row(s) selected.
+        } @else {
+          Sorting, paging and selection happen in-memory. Click a row, use the
+          checkboxes, or trigger a row action.
+        }
+      </p>
+
+      <lib-ui-table
+        [data]="clientData()"
+        [columns]="columns"
+        [actions]="actions"
+        [selectable]="true"
+        [showIndex]="true"
+        [clickableRows]="true"
+        pagingMode="client"
+        sortMode="client"
+        [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25]"
+        (action)="onAction($event)"
+        (rowClick)="onRowClick($event)"
+        (selectionChange)="onSelectionChange($event)"
+      >
+        <!-- Custom cell template for the status column -->
+        <ng-template uiColumnCell="status" let-row>
+          <span [class]="badgeClass($any(row).status)">{{ $any(row).status }}</span>
+        </ng-template>
+      </lib-ui-table>
+    </div>
+  </mat-tab>
+
+  <!-- Server-side paging + sorting -->
+  <mat-tab label="Server-side">
+    <div class="tab-body">
+      <p class="hint">
+        The table emits <code>pageChange</code> / <code>sortChange</code>; the
+        page is computed by the host (simulating a backend over
+        {{ serverTotal }} records).
+      </p>
+
+      <lib-ui-table
+        [data]="serverRows()"
+        [columns]="columns"
+        [actions]="actions"
+        [actionsAsMenu]="true"
+        [loading]="serverLoading()"
+        pagingMode="server"
+        sortMode="server"
+        [totalCount]="serverTotal"
+        [pageSize]="10"
+        [pageSizeOptions]="[10, 20, 50]"
+        (action)="onAction($event)"
+        (pageChange)="onServerPage($event)"
+        (sortChange)="onServerSort($event)"
+      >
+        <ng-template uiColumnCell="status" let-row>
+          <span [class]="badgeClass($any(row).status)">{{ $any(row).status }}</span>
+        </ng-template>
+      </lib-ui-table>
+    </div>
+  </mat-tab>
+</mat-tab-group>

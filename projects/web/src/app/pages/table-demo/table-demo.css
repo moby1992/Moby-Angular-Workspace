@@ -1,0 +1,47 @@
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.page-header__desc {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+}
+
+.tab-body {
+  padding-top: 1.25rem;
+}
+
+.hint {
+  margin: 0 0 1rem;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge--active {
+  background: #d7f5dd;
+  color: #1b5e20;
+}
+
+.badge--leave {
+  background: #fff3cd;
+  color: #8a6d00;
+}
+
+.badge--terminated {
+  background: #fbdcdc;
+  color: #b71c1c;
+}

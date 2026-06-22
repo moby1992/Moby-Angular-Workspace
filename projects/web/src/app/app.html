@@ -1,37 +1,50 @@
-<mat-toolbar color="primary" class="!flex items-center gap-2">
-  <mat-icon>directions_boat</mat-icon>
-  <span>{{ title() }}</span>
-</mat-toolbar>
-
-<main class="mx-auto max-w-5xl p-6">
-  <section class="mb-8">
-    <h1 class="text-3xl font-bold tracking-tight">
-      Angular 22 + Material 22 + Tailwind 4
-    </h1>
-    <p class="mt-2 text-gray-600">
-      An application and a shared <code>ui</code> library in one workspace.
-    </p>
-  </section>
-
-  <section class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-    <lib-ui-card title="Application" subtitle="projects/web" actionLabel="Open">
-      The Angular application that consumes the shared library.
-    </lib-ui-card>
-
-    <lib-ui-card title="Library" subtitle="projects/ui" actionLabel="View">
-      A buildable library exposing the reusable <code>UiCard</code> component.
-    </lib-ui-card>
-
-    <lib-ui-card title="Styling" subtitle="Material + Tailwind" actionLabel="Tweak">
-      Material components themed with azure/blue, utilities from Tailwind 4.
-    </lib-ui-card>
-  </section>
-
-  <section class="mt-8 flex flex-wrap gap-3">
-    <button mat-flat-button color="primary">
-      <mat-icon>rocket_launch</mat-icon>
-      Get started
+<div class="app-shell">
+  <!-- Header -->
+  <mat-toolbar color="primary" class="app-header">
+    <button mat-icon-button (click)="toggleSidenav()" aria-label="Toggle navigation">
+      <mat-icon>menu</mat-icon>
     </button>
-    <button mat-stroked-button>Documentation</button>
-  </section>
-</main>
+    <mat-icon class="app-header__logo">directions_boat</mat-icon>
+    <span class="app-header__title">{{ title() }}</span>
+    <span class="app-header__spacer"></span>
+    <a
+      mat-icon-button
+      href="https://material.angular.io"
+      target="_blank"
+      rel="noreferrer"
+      aria-label="Documentation"
+    >
+      <mat-icon>open_in_new</mat-icon>
+    </a>
+  </mat-toolbar>
+
+  <!-- Sidebar + main content -->
+  <mat-sidenav-container class="app-body">
+    <mat-sidenav
+      class="app-sidebar"
+      mode="side"
+      [opened]="sidenavOpen()"
+      [disableClose]="true"
+    >
+      <div class="app-sidebar__heading">Library Components</div>
+      <mat-nav-list>
+        @for (item of components(); track item.path) {
+          <a
+            mat-list-item
+            [routerLink]="item.path"
+            routerLinkActive
+            #rla="routerLinkActive"
+            [activated]="rla.isActive"
+          >
+            <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+            <span matListItemTitle>{{ item.label }}</span>
+          </a>
+        }
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="app-content">
+      <router-outlet />
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

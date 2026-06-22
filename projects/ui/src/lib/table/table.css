@@ -1,0 +1,64 @@
+.ui-table {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--mat-sys-surface, #fff);
+}
+
+.ui-table__progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.ui-table__scroll {
+  overflow-x: auto;
+}
+
+.ui-table__table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.ui-table__table th,
+.ui-table__table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-table__select-cell,
+.ui-table__index-cell {
+  width: 48px;
+  text-align: center;
+}
+
+.ui-table__actions-cell {
+  width: 1%;
+  white-space: nowrap;
+  text-align: end;
+}
+
+.ui-table__row--clickable {
+  cursor: pointer;
+}
+
+.ui-table__row--clickable:hover {
+  background: var(--mat-sys-surface-container-high, rgba(0, 0, 0, 0.04));
+}
+
+.ui-table__row--selected {
+  background: var(--mat-sys-secondary-container, rgba(0, 0, 0, 0.06));
+}
+
+.ui-table__empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+}

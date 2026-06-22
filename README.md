@@ -11,8 +11,33 @@ An Angular workspace containing one application and one shared library, built wi
 
 | Project | Type        | Location        | Description                                                       |
 | ------- | ----------- | --------------- | ----------------------------------------------------------------- |
-| `web`   | application | `projects/web`  | Demo application that consumes the `ui` library.                  |
-| `ui`    | library     | `projects/ui`   | Buildable library exposing the reusable `UiCard` Material component. |
+| `web`   | application | `projects/web`  | Demo app with a header / sidebar / main-content shell and a side menu that showcases each library component. |
+| `ui`    | library     | `projects/ui`   | Buildable library exposing reusable Material components (`UiCard`, `UiTable`). |
+
+## Library components
+
+### `UiTable` (`<lib-ui-table>`)
+
+A configuration-driven, generic Material data table. Highlights:
+
+- **Configurable columns** — `header`, `width`, `align`, `sticky`, built-in
+  `type` formatting (`text` / `number` / `currency` / `date` / `boolean`),
+  custom `cell` accessors, per-column `sortAccessor`, and `headerClass` /
+  `cellClass`.
+- **Paging** — client-side (in-memory) or server-side via the `pageChange`
+  output and `totalCount` input. Configurable `pageSize` / `pageSizeOptions`.
+- **Sorting** — client-side or server-side via the `sortChange` output.
+- **Row actions** — configured via the `actions` input (icon, color, per-row
+  `visible` / `disabled` predicates); rendered inline or as an overflow menu.
+- **Selection** — optional single/multi row selection with a `selectionChange`
+  output.
+- **Custom cell templates** — project an `<ng-template uiColumnCell="key">` to
+  fully control a column's rendering.
+- **Extras** — optional row-index column, clickable rows (`rowClick`), loading
+  bar, and an empty-state message.
+
+The application's **Data Table** page demonstrates both client-side and
+server-side modes.
 
 ## Styling
 
