@@ -1,77 +1,236 @@
 <header class="page-header">
   <h1 class="page-header__title">Data Table</h1>
   <p class="page-header__desc">
-    A configuration-driven Material table from the <code>ui</code> library.
-    Columns, widths, alignment, formatting, row actions, selection and custom
-    cell templates are all driven by inputs. Paging and sorting can run on the
-    client or be delegated to the server.
+    A configuration-driven Material table from the <code>ui</code> library. Use
+    the controls below to flip every input on and off and watch how the table
+    reacts. The event log shows the outputs (<code>action</code>,
+    <code>pageChange</code>, <code>sortChange</code>, <code>rowClick</code>,
+    <code>selectionChange</code>) as they fire.
   </p>
 </header>
 
-<mat-tab-group>
-  <!-- Client-side paging + sorting -->
-  <mat-tab label="Client-side">
-    <div class="tab-body">
-      <p class="hint">
-        @if (selectedCount() > 0) {
-          <strong>{{ selectedCount() }}</strong> row(s) selected.
-        } @else {
-          Sorting, paging and selection happen in-memory. Click a row, use the
-          checkboxes, or trigger a row action.
+<!-- ============================ CONTROL PANEL ============================ -->
+<mat-card appearance="outlined" class="panel">
+  <mat-card-content class="panel__grid">
+    <!-- Paging -->
+    <section class="group">
+      <h3 class="group__title">Paging</h3>
+      <mat-slide-toggle
+        [checked]="config().pageable"
+        (change)="update('pageable', $event.checked)"
+        >pageable</mat-slide-toggle
+      >
+      <div class="group__row">
+        <span class="group__label">pagingMode</span>
+        <mat-button-toggle-group
+          [value]="config().pagingMode"
+          [disabled]="!config().pageable"
+          (change)="update('pagingMode', $event.value)"
+          hideSingleSelectionIndicator
+        >
+          <mat-button-toggle value="client">client</mat-button-toggle>
+          <mat-button-toggle value="server">server</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+      <mat-form-field appearance="outline" class="group__field">
+        <mat-label>pageSize</mat-label>
+        <mat-select
+          [value]="config().pageSize"
+          (selectionChange)="update('pageSize', $event.value)"
+        >
+          @for (size of pageSizeOptions; track size) {
+            <mat-option [value]="size">{{ size }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </section>
+
+    <!-- Sorting -->
+    <section class="group">
+      <h3 class="group__title">Sorting</h3>
+      <mat-slide-toggle
+        [checked]="config().sortable"
+        (change)="update('sortable', $event.checked)"
+        >sortable</mat-slide-toggle
+      >
+      <div class="group__row">
+        <span class="group__label">sortMode</span>
+        <mat-button-toggle-group
+          [value]="config().sortMode"
+          [disabled]="!config().sortable"
+          (change)="update('sortMode', $event.value)"
+          hideSingleSelectionIndicator
+        >
+          <mat-button-toggle value="client">client</mat-button-toggle>
+          <mat-button-toggle value="server">server</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+    </section>
+
+    <!-- Selection -->
+    <section class="group">
+      <h3 class="group__title">Selection</h3>
+      <mat-slide-toggle
+        [checked]="config().selectable"
+        (change)="update('selectable', $event.checked)"
+        >selectable</mat-slide-toggle
+      >
+      <mat-slide-toggle
+        [checked]="config().multiSelect"
+        [disabled]="!config().selectable"
+        (change)="update('multiSelect', $event.checked)"
+        >multiSelect</mat-slide-toggle
+      >
+      <span class="group__hint">{{ selectedCount() }} selected</span>
+    </section>
+
+    <!-- Display -->
+    <section class="group">
+      <h3 class="group__title">Display</h3>
+      <mat-slide-toggle
+        [checked]="config().showIndex"
+        (change)="update('showIndex', $event.checked)"
+        >showIndex</mat-slide-toggle
+      >
+      <mat-slide-toggle
+        [checked]="config().clickableRows"
+        (change)="update('clickableRows', $event.checked)"
+        >clickableRows</mat-slide-toggle
+      >
+      <mat-slide-toggle
+        [checked]="config().loading"
+        (change)="update('loading', $event.checked)"
+        >loading</mat-slide-toggle
+      >
+    </section>
+
+    <!-- Actions -->
+    <section class="group">
+      <h3 class="group__title">Actions</h3>
+      <mat-slide-toggle
+        [checked]="config().withActions"
+        (change)="update('withActions', $event.checked)"
+        >show actions</mat-slide-toggle
+      >
+      <mat-slide-toggle
+        [checked]="config().actionsAsMenu"
+        [disabled]="!config().withActions"
+        (change)="update('actionsAsMenu', $event.checked)"
+        >actionsAsMenu</mat-slide-toggle
+      >
+      <mat-form-field appearance="outline" class="group__field">
+        <mat-label>actionsHeader</mat-label>
+        <input
+          matInput
+          [value]="config().actionsHeader"
+          [disabled]="!config().withActions"
+          (input)="update('actionsHeader', $any($event.target).value)"
+        />
+      </mat-form-field>
+    </section>
+
+    <!-- Data -->
+    <section class="group">
+      <h3 class="group__title">Data</h3>
+      <mat-form-field appearance="outline" class="group__field">
+        <mat-label>rowCount</mat-label>
+        <mat-select
+          [value]="config().rowCount"
+          (selectionChange)="update('rowCount', $event.value)"
+        >
+          @for (n of rowCountOptions; track n) {
+            <mat-option [value]="n">{{ n }} rows</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-slide-toggle
+        [checked]="config().emptyData"
+        (change)="update('emptyData', $event.checked)"
+        >emptyData</mat-slide-toggle
+      >
+      <mat-form-field appearance="outline" class="group__field">
+        <mat-label>emptyMessage</mat-label>
+        <input
+          matInput
+          [value]="config().emptyMessage"
+          (input)="update('emptyMessage', $any($event.target).value)"
+        />
+      </mat-form-field>
+    </section>
+
+    <!-- Column visibility -->
+    <section class="group group--wide">
+      <h3 class="group__title">Columns ({{ allColumns.length }})</h3>
+      <div class="group__columns">
+        @for (col of allColumns; track col.key) {
+          <mat-checkbox
+            [checked]="columnVisibility()[col.key]"
+            (change)="toggleColumn(col.key, $event.checked)"
+          >
+            {{ col.header }}
+          </mat-checkbox>
         }
+      </div>
+    </section>
+  </mat-card-content>
+</mat-card>
+
+<!-- ============================== THE TABLE ============================== -->
+<lib-ui-table
+  [data]="tableData()"
+  [columns]="columns()"
+  [actions]="config().withActions ? actions : noActions"
+  [actionsHeader]="config().actionsHeader"
+  [actionsAsMenu]="config().actionsAsMenu"
+  [pageable]="config().pageable"
+  [pagingMode]="config().pagingMode"
+  [pageSize]="config().pageSize"
+  [pageSizeOptions]="pageSizeOptions"
+  [totalCount]="totalCount()"
+  [sortable]="config().sortable"
+  [sortMode]="config().sortMode"
+  [selectable]="config().selectable"
+  [multiSelect]="config().multiSelect"
+  [showIndex]="config().showIndex"
+  [clickableRows]="config().clickableRows"
+  [loading]="config().loading"
+  [emptyMessage]="config().emptyMessage"
+  (action)="onAction($event)"
+  (rowClick)="onRowClick($event)"
+  (selectionChange)="onSelectionChange($event)"
+  (pageChange)="onPage($event)"
+  (sortChange)="onSort($event)"
+>
+  <!-- Custom cell template: status badge -->
+  <ng-template uiColumnCell="status" let-row>
+    <span [class]="badgeClass($any(row).status)">{{ $any(row).status }}</span>
+  </ng-template>
+  <!-- Custom cell template: star rating -->
+  <ng-template uiColumnCell="rating" let-row>
+    <span class="stars" [attr.title]="$any(row).rating + ' / 5'">{{
+      stars($any(row).rating)
+    }}</span>
+  </ng-template>
+</lib-ui-table>
+
+<!-- ============================= EVENT LOG ============================== -->
+<mat-card appearance="outlined" class="events">
+  <mat-card-header class="events__header">
+    <mat-card-title>Event log</mat-card-title>
+    <button class="events__clear" (click)="clearLog()">Clear</button>
+  </mat-card-header>
+  <mat-card-content>
+    @if (events().length === 0) {
+      <p class="events__empty">
+        Interact with the table — sort, page, select, click rows or trigger
+        actions — to see the outputs here.
       </p>
-
-      <lib-ui-table
-        [data]="clientData()"
-        [columns]="columns"
-        [actions]="actions"
-        [selectable]="true"
-        [showIndex]="true"
-        [clickableRows]="true"
-        pagingMode="client"
-        sortMode="client"
-        [pageSize]="10"
-        [pageSizeOptions]="[5, 10, 25]"
-        (action)="onAction($event)"
-        (rowClick)="onRowClick($event)"
-        (selectionChange)="onSelectionChange($event)"
-      >
-        <!-- Custom cell template for the status column -->
-        <ng-template uiColumnCell="status" let-row>
-          <span [class]="badgeClass($any(row).status)">{{ $any(row).status }}</span>
-        </ng-template>
-      </lib-ui-table>
-    </div>
-  </mat-tab>
-
-  <!-- Server-side paging + sorting -->
-  <mat-tab label="Server-side">
-    <div class="tab-body">
-      <p class="hint">
-        The table emits <code>pageChange</code> / <code>sortChange</code>; the
-        page is computed by the host (simulating a backend over
-        {{ serverTotal }} records).
-      </p>
-
-      <lib-ui-table
-        [data]="serverRows()"
-        [columns]="columns"
-        [actions]="actions"
-        [actionsAsMenu]="true"
-        [loading]="serverLoading()"
-        pagingMode="server"
-        sortMode="server"
-        [totalCount]="serverTotal"
-        [pageSize]="10"
-        [pageSizeOptions]="[10, 20, 50]"
-        (action)="onAction($event)"
-        (pageChange)="onServerPage($event)"
-        (sortChange)="onServerSort($event)"
-      >
-        <ng-template uiColumnCell="status" let-row>
-          <span [class]="badgeClass($any(row).status)">{{ $any(row).status }}</span>
-        </ng-template>
-      </lib-ui-table>
-    </div>
-  </mat-tab>
-</mat-tab-group>
+    } @else {
+      <ul class="events__list">
+        @for (entry of events(); track $index) {
+          <li>{{ entry }}</li>
+        }
+      </ul>
+    }
+  </mat-card-content>
+</mat-card>
