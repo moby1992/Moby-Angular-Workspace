@@ -80,3 +80,81 @@ export interface TableSortEvent {
   active: string;
   direction: SortDirection;
 }
+
+/**
+ * Consolidated configuration for `<lib-ui-table>`. Everything except the row
+ * `data` (which is passed separately) is set through this single object, so a
+ * consumer binds just `[data]` and `[config]`. Every field is optional and
+ * falls back to a sensible default.
+ */
+export interface UiTableConfig<T = unknown> {
+  /** Column configuration (order = display order). */
+  columns?: TableColumn<T>[];
+  /** Track-by function for efficient row rendering. */
+  trackBy?: (index: number, row: T) => unknown;
+
+  // Paging
+  /** Show the paginator. Default `true`. */
+  pageable?: boolean;
+  /** `'client'` paginates in-memory; `'server'` emits `pageChange`. Default `'client'`. */
+  pagingMode?: DataMode;
+  /** Page size. Default `10`. */
+  pageSize?: number;
+  /** Available page size options. Default `[5, 10, 25, 50]`. */
+  pageSizeOptions?: number[];
+  /** Total row count for server-side paging (defaults to `data.length`). */
+  totalCount?: number | null;
+
+  // Sorting
+  /** Enable column sorting. Default `true`. */
+  sortable?: boolean;
+  /** `'client'` sorts in-memory; `'server'` emits `sortChange`. Default `'client'`. */
+  sortMode?: DataMode;
+
+  // Selection
+  /** Show a leading checkbox column and enable row selection. Default `false`. */
+  selectable?: boolean;
+  /** Allow selecting more than one row at a time. Default `true`. */
+  multiSelect?: boolean;
+
+  // Display
+  /** Show a leading 1-based row index column. Default `false`. */
+  showIndex?: boolean;
+  /** Row actions; renders a trailing actions column when non-empty. */
+  actions?: TableAction<T>[];
+  /** Header label for the actions column. Default `'Actions'`. */
+  actionsHeader?: string;
+  /** Collapse actions into an overflow menu instead of inline buttons. Default `false`. */
+  actionsAsMenu?: boolean;
+  /** Show an indeterminate progress bar over the table. Default `false`. */
+  loading?: boolean;
+  /** Message shown when there are no rows. */
+  emptyMessage?: string;
+  /** Make rows visually clickable and emit `rowClick`. Default `false`. */
+  clickableRows?: boolean;
+}
+
+/** Fully-resolved table configuration (all defaults applied). */
+export type ResolvedTableConfig<T = unknown> = Required<UiTableConfig<T>>;
+
+/** Default configuration merged under any consumer-supplied `config`. */
+export const UI_TABLE_DEFAULTS: ResolvedTableConfig = {
+  columns: [],
+  trackBy: (index: number) => index,
+  pageable: true,
+  pagingMode: 'client',
+  pageSize: 10,
+  pageSizeOptions: [5, 10, 25, 50],
+  totalCount: null,
+  sortable: true,
+  sortMode: 'client',
+  selectable: false,
+  multiSelect: true,
+  showIndex: false,
+  actions: [],
+  actionsHeader: 'Actions',
+  actionsAsMenu: false,
+  loading: false,
+  emptyMessage: 'No data to display.',
+  clickableRows: false,
+};

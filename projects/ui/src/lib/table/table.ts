@@ -26,12 +26,14 @@ import { CommonModule } from '@angular/common';
 
 import { UiColumnCell } from './column-cell.directive';
 import {
-  DataMode,
+  ResolvedTableConfig,
   TableAction,
   TableActionEvent,
   TableColumn,
   TablePageEvent,
   TableSortEvent,
+  UiTableConfig,
+  UI_TABLE_DEFAULTS,
 } from './table.types';
 
 /**
@@ -40,6 +42,9 @@ import {
  * Supports client- or server-side paging and sorting, configurable columns
  * (width, alignment, formatting, sticky), row selection, configurable row
  * actions, custom cell templates, loading and empty states.
+ *
+ * The row `data` is passed on its own input; every other option is supplied
+ * through the single consolidated `config` input ({@link UiTableConfig}).
  */
 @Component({
   selector: 'lib-ui-table',
@@ -60,55 +65,38 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UiTable<T = Record<string, unknown>> {
-  // ---- Data & columns ----------------------------------------------------
+  // ---- Inputs ------------------------------------------------------------
   /** Row data for the current view. */
   readonly data = input<T[]>([]);
-  /** Column configuration. */
-  readonly columns = input<TableColumn<T>[]>([]);
-  /** Track-by function for efficient row rendering. */
-  readonly trackBy = input<(index: number, row: T) => unknown>(
-    (index) => index,
-  );
+  /** Consolidated table configuration (see {@link UiTableConfig}). */
+  readonly config = input<UiTableConfig<T>>({});
 
-  // ---- Paging ------------------------------------------------------------
-  /** Show the paginator. */
-  readonly pageable = input(true);
-  /** `'client'` paginates in-memory; `'server'` emits `pageChange`. */
-  readonly pagingMode = input<DataMode>('client');
-  /** Page size. */
-  readonly pageSize = input(10);
-  /** Available page size options. */
-  readonly pageSizeOptions = input<number[]>([5, 10, 25, 50]);
-  /** Total row count for server-side paging (defaults to `data.length`). */
-  readonly totalCount = input<number | null>(null);
+  /** Consumer config merged over the defaults. */
+  private readonly cfg = computed<ResolvedTableConfig<T>>(() => ({
+    ...(UI_TABLE_DEFAULTS as unknown as ResolvedTableConfig<T>),
+    ...this.config(),
+  }));
 
-  // ---- Sorting -----------------------------------------------------------
-  /** Enable column sorting. */
-  readonly sortable = input(true);
-  /** `'client'` sorts in-memory; `'server'` emits `sortChange`. */
-  readonly sortMode = input<DataMode>('client');
-
-  // ---- Selection ---------------------------------------------------------
-  /** Show a leading checkbox column and enable row selection. */
-  readonly selectable = input(false);
-  /** Allow selecting more than one row at a time. */
-  readonly multiSelect = input(true);
-
-  // ---- Misc display ------------------------------------------------------
-  /** Show a leading 1-based row index column. */
-  readonly showIndex = input(false);
-  /** Row action configuration; renders a trailing actions column when set. */
-  readonly actions = input<TableAction<T>[]>([]);
-  /** Header label for the actions column. */
-  readonly actionsHeader = input('Actions');
-  /** Collapse actions into an overflow menu instead of inline buttons. */
-  readonly actionsAsMenu = input(false);
-  /** Show an indeterminate progress bar over the table. */
-  readonly loading = input(false);
-  /** Message shown when there are no rows. */
-  readonly emptyMessage = input('No data to display.');
-  /** Make rows visually clickable and emit `rowClick`. */
-  readonly clickableRows = input(false);
+  // Derived settings — kept as the same call-signature (`x()`) the template
+  // and helpers already use, so only the input surface changed.
+  protected readonly columns = computed(() => this.cfg().columns);
+  protected readonly trackBy = computed(() => this.cfg().trackBy);
+  protected readonly pageable = computed(() => this.cfg().pageable);
+  protected readonly pagingMode = computed(() => this.cfg().pagingMode);
+  protected readonly pageSize = computed(() => this.cfg().pageSize);
+  protected readonly pageSizeOptions = computed(() => this.cfg().pageSizeOptions);
+  protected readonly totalCount = computed(() => this.cfg().totalCount);
+  protected readonly sortable = computed(() => this.cfg().sortable);
+  protected readonly sortMode = computed(() => this.cfg().sortMode);
+  protected readonly selectable = computed(() => this.cfg().selectable);
+  protected readonly multiSelect = computed(() => this.cfg().multiSelect);
+  protected readonly showIndex = computed(() => this.cfg().showIndex);
+  protected readonly actions = computed(() => this.cfg().actions);
+  protected readonly actionsHeader = computed(() => this.cfg().actionsHeader);
+  protected readonly actionsAsMenu = computed(() => this.cfg().actionsAsMenu);
+  protected readonly loading = computed(() => this.cfg().loading);
+  protected readonly emptyMessage = computed(() => this.cfg().emptyMessage);
+  protected readonly clickableRows = computed(() => this.cfg().clickableRows);
 
   // ---- Outputs -----------------------------------------------------------
   readonly action = output<TableActionEvent<T>>();

@@ -33,7 +33,7 @@ describe('UiTable', () => {
   });
 
   it('should render configured columns and rows', async () => {
-    fixture.componentRef.setInput('columns', columns);
+    fixture.componentRef.setInput('config', { columns });
     fixture.componentRef.setInput('data', [
       { id: 1, name: 'Alpha' },
       { id: 2, name: 'Beta' },
@@ -48,9 +48,11 @@ describe('UiTable', () => {
   });
 
   it('should add a trailing actions column when actions are configured', async () => {
-    fixture.componentRef.setInput('columns', columns);
+    fixture.componentRef.setInput('config', {
+      columns,
+      actions: [{ id: 'edit', label: 'Edit', icon: 'edit' }],
+    });
     fixture.componentRef.setInput('data', [{ id: 1, name: 'Alpha' }]);
-    fixture.componentRef.setInput('actions', [{ id: 'edit', label: 'Edit', icon: 'edit' }]);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -58,9 +60,8 @@ describe('UiTable', () => {
   });
 
   it('should show the empty message when there is no data', async () => {
-    fixture.componentRef.setInput('columns', columns);
+    fixture.componentRef.setInput('config', { columns, emptyMessage: 'Nothing here' });
     fixture.componentRef.setInput('data', []);
-    fixture.componentRef.setInput('emptyMessage', 'Nothing here');
     await fixture.whenStable();
     fixture.detectChanges();
 

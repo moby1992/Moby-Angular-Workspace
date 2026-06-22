@@ -18,6 +18,7 @@ import {
   TableSortEvent,
   UiColumnCell,
   UiTable,
+  UiTableConfig,
 } from 'ui';
 
 interface Employee {
@@ -223,6 +224,30 @@ export class TableDemo {
   });
 
   protected readonly totalCount = computed(() => this.dataset().length);
+
+  /** Everything the playground controls, assembled into one table config. */
+  protected readonly tableConfig = computed<UiTableConfig<Employee>>(() => {
+    const c = this.config();
+    return {
+      columns: this.columns(),
+      actions: c.withActions ? this.actions : this.noActions,
+      actionsHeader: c.actionsHeader,
+      actionsAsMenu: c.actionsAsMenu,
+      pageable: c.pageable,
+      pagingMode: c.pagingMode,
+      pageSize: c.pageSize,
+      pageSizeOptions: this.pageSizeOptions,
+      totalCount: this.totalCount(),
+      sortable: c.sortable,
+      sortMode: c.sortMode,
+      selectable: c.selectable,
+      multiSelect: c.multiSelect,
+      showIndex: c.showIndex,
+      clickableRows: c.clickableRows,
+      loading: c.loading,
+      emptyMessage: c.emptyMessage,
+    };
+  });
 
   // ---- Live output inspection -------------------------------------------
   protected readonly selectedCount = signal(0);
