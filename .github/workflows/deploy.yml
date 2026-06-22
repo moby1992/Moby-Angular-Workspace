@@ -1,0 +1,72 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - claude/angular-workspace-setup-p1nndr
+  workflow_dispatch:
+
+# Permissions required by the GitHub Pages deployment actions.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the
+# in-progress and latest. Do not cancel in-progress runs mid-deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build library
+        run: npm run build -- ui --configuration=production
+
+      - name: Build application
+        # Base href must match the Pages sub-path (the repository name) so that
+        # assets and router links resolve under https://<owner>.github.io/<repo>/.
+        run: npm run build -- web --configuration=production --base-href=/${{ github.event.repository.name }}/
+
+      - name: Add SPA fallback and disable Jekyll
+        # Pages has no server-side rewrite, so deep links (e.g. /components/card)
+        # must fall back to index.html; .nojekyll keeps files starting with "_".
+        run: |
+          cp dist/web/browser/index.html dist/web/browser/404.html
+          touch dist/web/browser/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/web/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
