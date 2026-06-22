@@ -1,0 +1,13 @@
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* Global base styles */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
